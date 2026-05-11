@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltStore - Electronics</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
+body{background:#0a0a0f;color:#e8e8f0;min-height:100vh}
+nav{background:#111118;border-bottom:1px solid #1e1e2e;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+.logo{font-size:22px;font-weight:700;color:#a78bfa;letter-spacing:-1px}
+.logo span{color:#fff}
+.nav-links{display:flex;gap:0}
+.nav-links a{color:#888;font-size:14px;text-decoration:none;padding:8px 14px;border-radius:8px;cursor:pointer;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff;background:#1e1e2e}
+.nav-right{display:flex;align-items:center;gap:12px}
+.search-box{background:#1e1e2e;border:1px solid #2a2a3e;border-radius:8px;padding:7px 14px;color:#e8e8f0;font-size:13px;width:200px;outline:none}
+.search-box:focus{border-color:#a78bfa}
+.cart-btn{background:#a78bfa;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s}
+.cart-btn:hover{background:#9166f0}
+.cbadge{background:#ff4757;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.login-btn{background:transparent;color:#a78bfa;border:1px solid #a78bfa;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.login-btn:hover{background:#a78bfa;color:#fff}
+.logout-btn{background:transparent;color:#ff4757;border:1px solid #ff475744;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;margin-left:8px}
+.logout-btn:hover{background:#ff475722}
+.page{display:none}.page.active{display:block}
+.hero{background:#0f0f1a;padding:5rem 2rem;text-align:center;border-bottom:1px solid #1e1e2e}
+.hero-tag{background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa44;border-radius:20px;padding:4px 14px;font-size:12px;display:inline-block;margin-bottom:1.5rem}
+.hero h1{font-size:48px;font-weight:800;color:#fff;margin-bottom:1rem;line-height:1.1}
+.hero h1 span{color:#a78bfa}
+.hero p{font-size:16px;color:#888;max-width:500px;margin:0 auto 2rem;line-height:1.7}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:#a78bfa;color:#fff;border:none;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#9166f0;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:#a78bfa;border:1px solid #a78bfa;padding:13px 28px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-outline:hover{background:#a78bfa22}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1e1e2e;border-top:1px solid #1e1e2e;border-bottom:1px solid #1e1e2e}
+.stat{background:#0a0a0f;padding:1.5rem;text-align:center}
+.stat-num{font-size:24px;font-weight:700;color:#a78bfa}
+.stat-label{font-size:12px;color:#666;margin-top:4px}
+.section{padding:3rem 2rem;max-width:1100px;margin:0 auto}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.section-head h2{font-size:22px;font-weight:700;color:#fff}
+.see-all{color:#a78bfa;font-size:13px;cursor:pointer;background:none;border:none;text-decoration:underline}
+.cats{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:3rem}
+.cat-card{background:#111118;border:1px solid #1e1e2e;border-radius:12px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s}
+.cat-card:hover{border-color:#a78bfa;background:#1a1228}
+.cat-icon{font-size:28px;margin-bottom:8px}
+.cat-name{font-size:13px;color:#ccc;font-weight:500}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1.25rem}
+.pcard{background:#111118;border:1px solid #1e1e2e;border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s}
+.pcard:hover{border-color:#a78bfa;transform:translateY(-2px)}
+.pcard-img{height:130px;display:flex;align-items:center;justify-content:center;font-size:52px;background:#0f0f1a;position:relative}
+.pcard-badge{position:absolute;top:8px;left:8px;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:#a78bfa}
+.pcard-badge.sale{background:#ff4757}
+.pcard-badge.new-b{background:#2ed573;color:#000}
+.pcard-info{padding:1rem}
+.pcard-cat{font-size:11px;color:#666;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.pcard-name{font-size:14px;font-weight:600;color:#e8e8f0;margin-bottom:6px}
+.pcard-rating{display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.stars{color:#ffd700;font-size:11px}
+.rating-count{font-size:11px;color:#666}
+.pcard-bottom{display:flex;align-items:center;justify-content:space-between}
+.pcard-price{font-size:16px;font-weight:700;color:#a78bfa}
+.pcard-old{font-size:12px;color:#555;text-decoration:line-through;margin-left:4px}
+.add-cart{background:#a78bfa22;color:#a78bfa;border:1px solid #a78bfa44;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.add-cart:hover{background:#a78bfa;color:#fff}
+.banner{background:#1a1228;border:1px solid #a78bfa33;border-radius:16px;padding:2rem;margin:0 2rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.banner-text h3{font-size:20px;font-weight:700;color:#fff;margin-bottom:6px}
+.banner-text p{font-size:13px;color:#888}
+.newsletter{background:#111118;border:1px solid #1e1e2e;border-radius:16px;padding:2.5rem;text-align:center;margin:2rem 2rem 3rem}
+.newsletter h3{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px}
+.newsletter p{font-size:14px;color:#888;margin-bottom:1.5rem}
+.nl-form{display:flex;gap:8px;max-width:400px;margin:0 auto}
+.nl-input{flex:1;background:#1e1e2e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 14px;color:#e8e8f0;font-size:13px;outline:none}
+.products-page{padding:2rem;max-width:1100px;margin:0 auto}
+.page-header{margin-bottom:2rem}
+.page-header h2{font-size:24px;font-weight:700;color:#fff;margin-bottom:6px}
+.page-header p{color:#888;font-size:14px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem}
+.filter-btn{background:#111118;color:#888;border:1px solid #1e1e2e;padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s}
+.filter-btn:hover,.filter-btn.active{background:#a78bfa;color:#fff;border-color:#a78bfa}
+.sort-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.sort-row span{font-size:13px;color:#666}
+.sort-select{background:#111118;color:#e8e8f0;border:1px solid #1e1e2e;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;outline:none}
+.cart-page{padding:2rem;max-width:1000px;margin:0 auto}
+.cart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.cart-header h2{font-size:24px;font-weight:700;color:#fff}
+.clear-btn{color:#ff4757;background:none;border:1px solid #ff475744;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer}
+.cart-empty{text-align:center;padding:5rem 2rem}
+.cart-empty p{color:#666;font-size:16px;margin-bottom:1.5rem}
+.cart-layout{display:grid;grid-template-columns:1fr 320px;gap:2rem}
+.cart-items{display:flex;flex-direction:column;gap:1rem}
+.cart-item{background:#111118;border:1px solid #1e1e2e;border-radius:14px;padding:1.25rem;display:flex;gap:1rem;align-items:center}
+.cart-item-img{font-size:36px;width:56px;text-align:center;background:#0f0f1a;border-radius:10px;height:56px;display:flex;align-items:center;justify-content:center}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:15px;font-weight:600;color:#e8e8f0;margin-bottom:4px}
+.cart-item-cat{font-size:12px;color:#666;margin-bottom:8px;text-transform:uppercase}
+.cart-item-price{font-size:15px;font-weight:700;color:#a78bfa}
+.qty-controls{display:flex;align-items:center;gap:8px}
+.qty-btn{background:#1e1e2e;color:#e8e8f0;border:none;width:30px;height:30px;border-radius:6px;font-size:16px;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center}
+.qty-btn:hover{background:#a78bfa}
+.qty-num{font-size:15px;font-weight:600;min-width:28px;text-align:center}
+.del-btn{color:#ff4757;background:#ff475722;border:1px solid #ff475744;width:32px;height:32px;border-radius:8px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.summary-box{background:#111118;border:1px solid #1e1e2e;border-radius:14px;padding:1.5rem;height:fit-content;position:sticky;top:80px}
+.summary-box h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:1.25rem;padding-bottom:12px;border-bottom:1px solid #1e1e2e}
+.sum-row{display:flex;justify-content:space-between;font-size:14px;color:#888;margin-bottom:10px}
+.sum-total{display:flex;justify-content:space-between;font-size:17px;font-weight:700;color:#fff;border-top:1px solid #1e1e2e;padding-top:14px;margin-top:8px}
+.coupon-row{display:flex;gap:8px;margin:1rem 0}
+.coupon-input{flex:1;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:9px 12px;color:#e8e8f0;font-size:13px;outline:none}
+.coupon-input:focus{border-color:#a78bfa}
+.apply-btn{background:#1e1e2e;color:#a78bfa;border:1px solid #a78bfa44;padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600}
+.apply-btn:hover{background:#a78bfa22}
+.checkout-btn{width:100%;background:#a78bfa;color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:1rem;transition:background .2s}
+.checkout-btn:hover{background:#9166f0}
+.about-page{padding:3rem 2rem;max-width:1000px;margin:0 auto}
+.about-hero{text-align:center;margin-bottom:3rem}
+.about-hero h2{font-size:32px;font-weight:800;color:#fff;margin-bottom:1rem}
+.about-hero p{font-size:15px;color:#888;line-height:1.8;max-width:600px;margin:0 auto}
+.about-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem}
+.about-card{background:#111118;border:1px solid #1e1e2e;border-radius:14px;padding:1.5rem}
+.about-card-icon{font-size:28px;margin-bottom:12px}
+.about-card h4{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+.about-card p{font-size:13px;color:#888;line-height:1.6}
+.devops-section{background:#1a1228;border:1px solid #a78bfa33;border-radius:16px;padding:2rem;margin-bottom:3rem}
+.devops-section h3{font-size:18px;font-weight:700;color:#a78bfa;margin-bottom:1rem}
+.devops-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin:1rem 0}
+.tool-card{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:10px;padding:1rem;text-align:center}
+.tool-card strong{font-size:13px;color:#fff;display:block;margin-bottom:4px}
+.tool-card span{font-size:11px;color:#666}
+.pipe{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:1rem}
+.pipe-step{background:#0a0a0f;border:1px solid #a78bfa44;border-radius:8px;padding:6px 12px;font-size:12px;color:#a78bfa}
+.pipe-arr{color:#444;font-size:12px}
+.auth-page{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.auth-box{background:#111118;border:1px solid #1e1e2e;border-radius:16px;padding:2.5rem;width:100%;max-width:420px}
+.auth-box h2{font-size:24px;font-weight:800;color:#fff;margin-bottom:8px;text-align:center}
+.auth-box p{font-size:14px;color:#888;text-align:center;margin-bottom:2rem}
+.auth-field{margin-bottom:1.25rem}
+.auth-field label{font-size:13px;color:#888;display:block;margin-bottom:6px}
+.auth-field input{width:100%;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:11px 14px;color:#e8e8f0;font-size:14px;outline:none;transition:border-color .2s}
+.auth-field input:focus{border-color:#a78bfa}
+.auth-btn{width:100%;background:#a78bfa;color:#fff;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:0.5rem;transition:background .2s}
+.auth-btn:hover{background:#9166f0}
+.auth-link{text-align:center;margin-top:1.25rem;font-size:13px;color:#888}
+.auth-link a{color:#a78bfa;cursor:pointer;text-decoration:underline}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:1.25rem 0}
+.auth-divider span{font-size:12px;color:#444}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:#1e1e2e}
+.forgot{text-align:right;margin-top:-8px;margin-bottom:1.25rem}
+.forgot a{font-size:12px;color:#a78bfa;cursor:pointer;text-decoration:underline}
+.strength-bar{height:4px;border-radius:4px;margin-top:6px;background:#1e1e2e;overflow:hidden}
+.strength-fill{height:100%;border-radius:4px;transition:width .3s,background .3s}
+.error-msg{color:#ff4757;font-size:12px;margin-top:4px;display:none}
+.toast{position:fixed;bottom:24px;right:24px;background:#a78bfa;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+.toast.show{opacity:1}
+footer{background:#111118;border-top:1px solid #1e1e2e;padding:1.5rem;text-align:center}
+footer p{font-size:13px;color:#444}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Volt<span>Store</span></div>
+  <div class="nav-links">
+    <a class="active" onclick="goPage('home',this)">Home</a>
+    <a onclick="goPage('products',this)">Products</a>
+    <a onclick="goPage('cart',this)">Cart</a>
+    <a onclick="goPage('about',this)">About</a>
+  </div>
+  <div class="nav-right">
+    <input class="search-box" id="search-input" placeholder="Search products..." oninput="onSearch(this.value)">
+    <button class="cart-btn" onclick="goPage('cart',document.querySelectorAll('.nav-links a')[2])">
+      &#128722; Cart <span class="cbadge" id="cart-badge">0</span>
+    </button>
+    <button class="login-btn" onclick="goPage('login',null)" id="login-nav-btn">Login</button>
+    <div class="user-info" id="user-info" style="display:none;align-items:center">
+      <span id="user-name-nav" style="font-size:13px;color:#a78bfa;font-weight:600"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-tag">&#9889; India's Next Generation Electronics Store</div>
+    <h1>Shop Smarter.<br><span>Live Better.</span></h1>
+    <p>Discover the latest laptops, phones, audio gear and accessories. Fast delivery, easy returns, and unbeatable prices across India.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="goPage('products',document.querySelectorAll('.nav-links a')[1])">Shop Now &#8594;</button>
+      <button class="btn-outline" onclick="goPage('about',document.querySelectorAll('.nav-links a')[3])">Our Story</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Happy customers</div></div>
+    <div class="stat"><div class="stat-num">1200+</div><div class="stat-label">Products</div></div>
+    <div class="stat"><div class="stat-num">4.9 &#9733;</div><div class="stat-label">Average rating</div></div>
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Customer support</div></div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h2>Shop by category</h2></div>
+    <div class="cats">
+      <div class="cat-card" onclick="filterAndGo('laptop')"><div class="cat-icon">&#128187;</div><div class="cat-name">Laptops</div></div>
+      <div class="cat-card" onclick="filterAndGo('phone')"><div class="cat-icon">&#128241;</div><div class="cat-name">Phones</div></div>
+      <div class="cat-card" onclick="filterAndGo('audio')"><div class="cat-icon">&#127911;</div><div class="cat-name">Audio</div></div>
+      <div class="cat-card" onclick="filterAndGo('accessory')"><div class="cat-icon">&#9000;</div><div class="cat-name">Accessories</div></div>
+      <div class="cat-card" onclick="filterAndGo('gaming')"><div class="cat-icon">&#127918;</div><div class="cat-name">Gaming</div></div>
+    </div>
+    <div class="section-head">
+      <h2>Featured products</h2>
+      <button class="see-all" onclick="goPage('products',document.querySelectorAll('.nav-links a')[1])">See all &#8594;</button>
+    </div>
+    <div class="products-grid" id="featured-grid"></div>
+  </div>
+  <div class="banner">
+    <div class="banner-text">
+      <h3>&#128230; Free delivery on orders above &#8377;3,999</h3>
+      <p>Same day dispatch across major Indian cities. Track your order in real time.</p>
+    </div>
+    <button class="btn-primary" onclick="goPage('products',document.querySelectorAll('.nav-links a')[1])">Shop now</button>
+  </div>
+  <div class="newsletter">
+    <h3>&#128140; Stay in the loop</h3>
+    <p>Get exclusive deals and new arrivals straight to your inbox.</p>
+    <div class="nl-form">
+      <input class="nl-input" id="nl-email" placeholder="Enter your email address">
+      <button class="btn-primary" onclick="subscribe()">Subscribe</button>
+    </div>
+  </div>
+  <footer><p>&copy; 2025 VoltStore. All rights reserved.</p></footer>
+</div>
+
+<!-- PRODUCTS -->
+<div class="page" id="page-products">
+  <div class="products-page">
+    <div class="page-header">
+      <h2>All Products</h2>
+      <p>Browse our full collection of electronics</p>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterCat('all',this)">All</button>
+      <button class="filter-btn" onclick="filterCat('laptop',this)">&#128187; Laptops</button>
+      <button class="filter-btn" onclick="filterCat('phone',this)">&#128241; Phones</button>
+      <button class="filter-btn" onclick="filterCat('audio',this)">&#127911; Audio</button>
+      <button class="filter-btn" onclick="filterCat('accessory',this)">&#9000; Accessories</button>
+      <button class="filter-btn" onclick="filterCat('gaming',this)">&#127918; Gaming</button>
+    </div>
+    <div class="sort-row">
+      <span id="prod-count">Showing 12 products</span>
+      <select class="sort-select" onchange="sortProds(this.value)">
+        <option value="default">Sort: Featured</option>
+        <option value="low">Price: Low to High</option>
+        <option value="high">Price: High to Low</option>
+        <option value="rating">Top Rated</option>
+      </select>
+    </div>
+    <div class="products-grid" id="all-grid"></div>
+  </div>
+  <footer><p>&copy; 2025 VoltStore. All rights reserved.</p></footer>
+</div>
+
+<!-- CART -->
+<div class="page" id="page-cart">
+  <div class="cart-page">
+    <div class="cart-header">
+      <h2>&#128722; Your Cart</h2>
+      <button class="clear-btn" onclick="clearCart()">Clear all</button>
+    </div>
+    <div id="cart-content"></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="about-page">
+    <div class="about-hero">
+      <h2>About VoltStore</h2>
+      <p>We are a modern electronics e-commerce platform built with passion for technology. Our mission is to make cutting-edge electronics accessible to everyone across India with fast delivery and transparent pricing.</p>
+    </div>
+    <div class="about-cards">
+      <div class="about-card"><div class="about-card-icon">&#9889;</div><h4>Our Mission</h4><p>Making cutting-edge electronics accessible to every Indian household with fast delivery and transparent pricing.</p></div>
+      <div class="about-card"><div class="about-card-icon">&#128274;</div><h4>Secure Shopping</h4><p>All transactions protected with 256-bit SSL encryption and secure UPI, card and net banking gateways.</p></div>
+      <div class="about-card"><div class="about-card-icon">&#127775;</div><h4>Customer First</h4><p>30-day returns, 24/7 support, and a dedicated team always ready to help you.</p></div>
+    </div>
+    <div class="devops-section">
+      <h3>&#9881; Deployed via DevOps Pipeline</h3>
+      <p style="font-size:13px;color:#888;">This application is automatically built, tested, and deployed using a complete CI/CD pipeline:</p>
+      <div class="devops-tools">
+        <div class="tool-card"><strong>Maven</strong><span>Build & Test</span></div>
+        <div class="tool-card"><strong>Docker</strong><span>Container</span></div>
+        <div class="tool-card"><strong>GitHub</strong><span>Source Control</span></div>
+        <div class="tool-card"><strong>Jenkins</strong><span>CI/CD</span></div>
+        <div class="tool-card"><strong>Railway</strong><span>Deployment</span></div>
+      </div>
+      <p style="font-size:13px;color:#888;margin-top:1rem;">Automated pipeline flow:</p>
+      <div class="pipe">
+        <span class="pipe-step">Code push</span><span class="pipe-arr">&#8594;</span>
+        <span class="pipe-step">GitHub Actions</span><span class="pipe-arr">&#8594;</span>
+        <span class="pipe-step">Maven build</span><span class="pipe-arr">&#8594;</span>
+        <span class="pipe-step">Run tests</span><span class="pipe-arr">&#8594;</span>
+        <span class="pipe-step">Docker image</span><span class="pipe-arr">&#8594;</span>
+        <span class="pipe-step">Jenkins deploy</span><span class="pipe-arr">&#8594;</span>
+        <span class="pipe-step">Live &#10003;</span>
+      </div>
+    </div>
+  </div>
+  <footer><p>&copy; 2025 VoltStore. All rights reserved.</p></footer>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+  <div class="auth-page">
+    <div class="auth-box">
+      <h2>&#128274; Welcome Back</h2>
+      <p>Login to your VoltStore account</p>
+      <div class="auth-field">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com">
+        <div class="error-msg" id="login-email-err">Please enter a valid email</div>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Enter your password">
+        <div class="error-msg" id="login-pass-err">Password must be at least 6 characters</div>
+      </div>
+      <div class="forgot"><a onclick="showToast('&#128231; Password reset link sent!')">Forgot password?</a></div>
+      <button class="auth-btn" onclick="doLogin()">Login to VoltStore</button>
+      <div class="auth-divider"><span>or</span></div>
+      <div class="auth-link">Don't have an account? <a onclick="goPage('signup',null)">Sign up free</a></div>
+    </div>
+  </div>
+  <footer><p>&copy; 2025 VoltStore. All rights reserved.</p></footer>
+</div>
+
+<!-- SIGNUP -->
+<div class="page" id="page-signup">
+  <div class="auth-page">
+    <div class="auth-box">
+      <h2>&#127881; Create Account</h2>
+      <p>Join VoltStore and start shopping!</p>
+      <div class="auth-field">
+        <label>Full Name</label>
+        <input type="text" id="signup-name" placeholder="Your full name">
+        <div class="error-msg" id="signup-name-err">Please enter your name</div>
+      </div>
+      <div class="auth-field">
+        <label>Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@example.com">
+        <div class="error-msg" id="signup-email-err">Please enter a valid email</div>
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="signup-pass" placeholder="Create a password" oninput="checkStrength(this.value)">
+        <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0%"></div></div>
+        <div class="error-msg" id="signup-pass-err">Password must be at least 6 characters</div>
+      </div>
+      <div class="auth-field">
+        <label>Confirm Password</label>
+        <input type="password" id="signup-conf" placeholder="Confirm your password">
+        <div class="error-msg" id="signup-conf-err">Passwords do not match</div>
+      </div>
+      <button class="auth-btn" onclick="doSignup()">Create My Account</button>
+      <div class="auth-divider"><span>or</span></div>
+      <div class="auth-link">Already have an account? <a onclick="goPage('login',null)">Login here</a></div>
+    </div>
+  </div>
+  <footer><p>&copy; 2025 VoltStore. All rights reserved.</p></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const products=[
+  {id:1,name:'ProBook 15 Pro',cat:'laptop',price:74999,old:89999,icon:'&#128187;',badge:'Best Seller',rating:4.8,reviews:234},
+  {id:2,name:'UltraPhone X12',cat:'phone',price:62499,old:74999,icon:'&#128241;',badge:'New',rating:4.7,reviews:189},
+  {id:3,name:'Nova Wireless Buds',cat:'audio',price:10749,old:14999,icon:'&#127911;',badge:'Sale',rating:4.9,reviews:412},
+  {id:4,name:'MechKey Pro Keyboard',cat:'accessory',price:7499,old:null,icon:'&#9000;',badge:'Popular',rating:4.6,reviews:98},
+  {id:5,name:'CurveView 27" Monitor',cat:'accessory',price:28999,old:37499,icon:'&#128250;',badge:null,rating:4.7,reviews:156},
+  {id:6,name:'BassMax Headphones',cat:'audio',price:16599,old:20749,icon:'&#127925;',badge:'Top Rated',rating:4.9,reviews:321},
+  {id:7,name:'SwiftBook Air 14',cat:'laptop',price:91499,old:null,icon:'&#128187;',badge:'New',rating:4.8,reviews:87},
+  {id:8,name:'SnapPhone S9 Ultra',cat:'phone',price:49999,old:58249,icon:'&#128241;',badge:'Sale',rating:4.5,reviews:203},
+  {id:9,name:'GamePad Pro X',cat:'gaming',price:6599,old:null,icon:'&#127918;',badge:null,rating:4.6,reviews:145},
+  {id:10,name:'RGB Gaming Mouse',cat:'gaming',price:4999,old:6599,icon:'&#128432;',badge:'Sale',rating:4.7,reviews:267},
+  {id:11,name:'USB-C Hub 7-in-1',cat:'accessory',price:3999,old:null,icon:'&#128268;',badge:null,rating:4.5,reviews:89},
+  {id:12,name:'TrueSound Speaker',cat:'audio',price:13249,old:16599,icon:'&#128266;',badge:'Popular',rating:4.8,reviews:178},
+];
+
+let cart=[];
+let currentCat='all';
+let currentSearch='';
+let sortVal='default';
+let loggedInUser=null;
+
+function fmt(n){return '\u20B9'+n.toLocaleString('en-IN')}
+function starsHtml(r){let s='';for(let i=1;i<=5;i++)s+=i<=Math.floor(r)?'&#9733;':'&#9734;';return s}
+function badgeClass(b){if(!b)return '';if(b==='Sale')return 'sale';if(b==='New')return 'new-b';return '';}
+
+function makeCard(p){
+  return `<div class="pcard">
+    <div class="pcard-img">
+      ${p.badge?`<span class="pcard-badge ${badgeClass(p.badge)}">${p.badge}</span>`:''}
+      ${p.icon}
+    </div>
+    <div class="pcard-info">
+      <div class="pcard-cat">${p.cat}</div>
+      <div class="pcard-name">${p.name}</div>
+      <div class="pcard-rating">
+        <span class="stars">${starsHtml(p.rating)}</span>
+        <span class="rating-count">${p.rating} (${p.reviews})</span>
+      </div>
+      <div class="pcard-bottom">
+        <div>
+          <span class="pcard-price">${fmt(p.price)}</span>
+          ${p.old?`<span class="pcard-old">${fmt(p.old)}</span>`:''}
+        </div>
+        <button class="add-cart" onclick="addToCart(${p.id},event)">+ Add</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function getFiltered(){
+  let list=[...products];
+  if(currentCat!=='all')list=list.filter(p=>p.cat===currentCat);
+  if(currentSearch)list=list.filter(p=>p.name.toLowerCase().includes(currentSearch)||p.cat.toLowerCase().includes(currentSearch));
+  if(sortVal==='low')list.sort((a,b)=>a.price-b.price);
+  else if(sortVal==='high')list.sort((a,b)=>b.price-a.price);
+  else if(sortVal==='rating')list.sort((a,b)=>b.rating-a.rating);
+  return list;
+}
+
+function renderFeatured(){document.getElementById('featured-grid').innerHTML=products.slice(0,8).map(makeCard).join('');}
+function renderAll(){
+  const list=getFiltered();
+  document.getElementById('prod-count').textContent='Showing '+list.length+' products';
+  document.getElementById('all-grid').innerHTML=list.length?list.map(makeCard).join(''):'<p style="color:#666;grid-column:1/-1;text-align:center;padding:3rem">No products found.</p>';
+}
+
+function filterCat(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function filterAndGo(cat){
+  currentCat=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.classList.remove('active');
+    if(b.textContent.toLowerCase().includes(cat))b.classList.add('active');
+  });
+  goPage('products',document.querySelectorAll('.nav-links a')[1]);
+  renderAll();
+}
+
+function sortProds(val){sortVal=val;renderAll();}
+function onSearch(val){currentSearch=val.toLowerCase();if(currentSearch)goPage('products',document.querySelectorAll('.nav-links a')[1]);renderAll();}
+
+function addToCart(id,e){
+  if(e)e.stopPropagation();
+  const p=products.find(x=>x.id===id);
+  const ex=cart.find(x=>x.id===id);
+  if(ex)ex.qty++;else cart.push({...p,qty:1});
+  updateBadge();
+  showToast('&#10003; '+p.name+' added to cart!');
+}
+
+function updateBadge(){document.getElementById('cart-badge').textContent=cart.reduce((s,x)=>s+x.qty,0);}
+
+function clearCart(){
+  if(!cart.length)return;
+  cart=[];updateBadge();renderCart();showToast('Cart cleared!');
+}
+
+function changeQty(id,delta){
+  const item=cart.find(x=>x.id===id);
+  if(!item)return;
+  item.qty+=delta;
+  if(item.qty<=0)cart=cart.filter(x=>x.id!==id);
+  updateBadge();renderCart();
+}
+
+function removeItem(id){
+  cart=cart.filter(x=>x.id!==id);
+  updateBadge();renderCart();showToast('Item removed!');
+}
+
+function renderCart(){
+  const el=document.getElementById('cart-content');
+  if(!cart.length){
+    el.innerHTML='<div class="cart-empty"><p style="font-size:56px;margin-bottom:1rem">&#128722;</p><p>Your cart is empty!</p><button class="btn-primary" style="margin-top:1.5rem" onclick="goPage(\'products\',document.querySelectorAll(\'.nav-links a\')[1])">Browse Products &#8594;</button></div>';
+    return;
+  }
+  const subtotal=cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const shipping=subtotal>=3999?0:99;
+  const gst=Math.round(subtotal*0.18);
+  const total=subtotal+shipping+gst;
+  const savings=cart.reduce((s,x)=>s+(x.old?x.old-x.price:0)*x.qty,0);
+  const items=cart.map(item=>`
+    <div class="cart-item">
+      <div class="cart-item-img">${item.icon}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-cat">${item.cat}</div>
+        <div class="cart-item-price">${fmt(item.price)}</div>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)">&#8722;</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},1)">&#43;</button>
+      </div>
+      <button class="del-btn" onclick="removeItem(${item.id})">&#10005;</button>
+    </div>`).join('');
+  el.innerHTML=`<div class="cart-layout">
+    <div class="cart-items">${items}</div>
+    <div class="summary-box">
+      <h3>Order Summary</h3>
+      <div class="sum-row"><span>Subtotal (${cart.reduce((s,x)=>s+x.qty,0)} items)</span><span>${fmt(subtotal)}</span></div>
+      <div class="sum-row"><span>Delivery</span><span>${shipping===0?'<span style="color:#2ed573">FREE</span>':fmt(shipping)}</span></div>
+      <div class="sum-row"><span>GST (18%)</span><span>${fmt(gst)}</span></div>
+      <div class="coupon-row">
+        <input class="coupon-input" id="coupon-in" placeholder="Coupon code (try VOLT10)">
+        <button class="apply-btn" onclick="applyCoupon()">Apply</button>
+      </div>
+      <div class="sum-total"><span>Total</span><span>${fmt(total)}</span></div>
+      ${savings>0?`<p style="font-size:12px;color:#2ed573;margin-top:8px">&#9989; You save ${fmt(savings)} on this order!</p>`:''}
+      <button class="checkout-btn" onclick="checkout()">Proceed to Checkout &#8594;</button>
+      <p style="text-align:center;font-size:12px;color:#555;margin-top:12px">&#128274; UPI &nbsp;|&nbsp; Cards &nbsp;|&nbsp; Net Banking &nbsp;|&nbsp; EMI</p>
+    </div>
+  </div>`;
+}
+
+function applyCoupon(){
+  const val=document.getElementById('coupon-in').value.trim().toUpperCase();
+  if(val==='VOLT10')showToast('&#10003; VOLT10 applied! 10% off');
+  else if(val==='NEWUSER')showToast('&#10003; NEWUSER applied! \u20B9500 off');
+  else showToast('&#10060; Invalid coupon code');
+}
+
+function checkout(){
+  cart=[];updateBadge();renderCart();
+  showToast('&#10003; Order placed! Thank you for shopping!');
+}
+
+function subscribe(){
+  const email=document.getElementById('nl-email').value.trim();
+  if(!email||!email.includes('@')){showToast('&#10060; Please enter a valid email');return;}
+  document.getElementById('nl-email').value='';
+  showToast('&#10003; Subscribed successfully!');
+}
+
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value.trim();
+  let valid=true;
+  if(!email||!email.includes('@')){document.getElementById('login-email-err').style.display='block';valid=false;}
+  else{document.getElementById('login-email-err').style.display='none';}
+  if(!pass||pass.length<6){document.getElementById('login-pass-err').style.display='block';valid=false;}
+  else{document.getElementById('login-pass-err').style.display='none';}
+  if(!valid)return;
+  loggedInUser=email.split('@')[0];
+  updateAuthUI();
+  goPage('home',document.querySelectorAll('.nav-links a')[0]);
+  showToast('&#10003; Welcome back, '+loggedInUser+'!');
+}
+
+function doSignup(){
+  const name=document.getElementById('signup-name').value.trim();
+  const email=document.getElementById('signup-email').value.trim();
+  const pass=document.getElementById('signup-pass').value.trim();
+  const conf=document.getElementById('signup-conf').value.trim();
+  let valid=true;
+  if(!name){document.getElementById('signup-name-err').style.display='block';valid=false;}
+  else{document.getElementById('signup-name-err').style.display='none';}
+  if(!email||!email.includes('@')){document.getElementById('signup-email-err').style.display='block';valid=false;}
+  else{document.getElementById('signup-email-err').style.display='none';}
+  if(!pass||pass.length<6){document.getElementById('signup-pass-err').style.display='block';valid=false;}
+  else{document.getElementById('signup-pass-err').style.display='none';}
+  if(pass!==conf){document.getElementById('signup-conf-err').style.display='block';valid=false;}
+  else{document.getElementById('signup-conf-err').style.display='none';}
+  if(!valid)return;
+  loggedInUser=name;
+  updateAuthUI();
+  goPage('home',document.querySelectorAll('.nav-links a')[0]);
+  showToast('&#127881; Welcome to VoltStore, '+name+'!');
+}
+
+function logout(){
+  loggedInUser=null;
+  updateAuthUI();
+  goPage('home',document.querySelectorAll('.nav-links a')[0]);
+  showToast('&#128075; Logged out successfully!');
+}
+
+function updateAuthUI(){
+  if(loggedInUser){
+    document.getElementById('login-nav-btn').style.display='none';
+    document.getElementById('user-info').style.display='flex';
+    document.getElementById('user-name-nav').textContent='Hi, '+loggedInUser+'!';
+  } else {
+    document.getElementById('login-nav-btn').style.display='block';
+    document.getElementById('user-info').style.display='none';
+  }
+}
+
+function checkStrength(val){
+  const fill=document.getElementById('strength-fill');
+  if(val.length===0){fill.style.width='0%';}
+  else if(val.length<4){fill.style.width='25%';fill.style.background='#ff4757';}
+  else if(val.length<6){fill.style.width='50%';fill.style.background='#ffa502';}
+  else if(val.length<10){fill.style.width='75%';fill.style.background='#2ed573';}
+  else{fill.style.width='100%';fill.style.background='#7bed9f';}
+}
+
+function goPage(name,linkEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  if(linkEl)linkEl.classList.add('active');
+  if(name==='cart')renderCart();
+  window.scrollTo(0,0);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+renderFeatured();
+renderAll();
+</script>
+</body>
+</html>
