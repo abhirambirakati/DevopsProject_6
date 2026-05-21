@@ -5,7 +5,7 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                bat 'bat '"C:\\Users\\abhiram\\Downloads\\apache-maven-3.9.11-bin\\apache-maven-3.9.11\\bin\\mvn.cmd" clean install'
+                bat "\"C:\\Users\\abhiram\\Downloads\\apache-maven-3.9.11-bin\\apache-maven-3.9.11\\bin\\mvn.cmd\" clean install"
             }
         }
 
