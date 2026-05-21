@@ -1,4 +1,4 @@
-name: Spring Boot CI
+name: Devops Github CI
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  devops:
 
     runs-on: ubuntu-latest
 
@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
 
     - name: Build Maven Project
       run: mvn clean install

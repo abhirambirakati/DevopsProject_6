@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - VoltStore</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { min-height: 100vh; display: flex; background: #fff; }
+
+/* Left branding panel */
+.brand-panel {
+  width: 45%; min-height: 100vh; background: #000; color: #fff;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 3rem; position: relative; overflow: hidden;
+}
+.brand-panel::before {
+  content: ''; position: absolute; top: -30%; right: -30%; width: 80%; height: 80%;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.brand-logo {
+  font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px;
+  letter-spacing: -0.5px; position: relative; z-index: 1;
+}
+.brand-logo i { font-size: 20px; }
+
+.brand-hero { position: relative; z-index: 1; }
+.brand-hero h1 {
+  font-size: 44px; font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
+  margin-bottom: 1.5rem;
+}
+.brand-hero p {
+  font-size: 16px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 380px;
+}
+
+.brand-stats {
+  display: flex; gap: 3rem; position: relative; z-index: 1;
+  border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem;
+}
+.stat-item strong {
+  display: block; font-size: 28px; font-weight: 700; letter-spacing: -1px; margin-bottom: 4px;
+}
+.stat-item span { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+/* Right form panel */
+.form-panel {
+  flex: 1; min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; padding: 3rem;
+  background: #fafafa; position: relative; overflow: hidden;
+}
+
+/* Subtle dot grid pattern on right side */
+.form-panel::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 24px 24px; opacity: 0.5; pointer-events: none;
+}
+
+.form-container { width: 100%; max-width: 380px; position: relative; z-index: 1; }
+
+.form-heading {
+  font-size: 26px; font-weight: 700; color: #111827; margin-bottom: 6px; letter-spacing: -0.5px;
+}
+.form-sub {
+  font-size: 14px; color: #6b7280; margin-bottom: 2rem;
+}
+
+.google-btn {
+  width: 100%; padding: 11px; border-radius: 8px; background: #fff;
+  border: 1px solid #e5e7eb; color: #111827; font-size: 14px;
+  font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 10px; transition: 0.15s; text-decoration: none;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+}
+.google-btn:hover { background: #fff; border-color: #d1d5db; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
+.google-icon { width: 18px; height: 18px; }
+
+.divider {
+  display: flex; align-items: center; gap: 14px; margin: 1.5rem 0;
+}
+.divider span { font-size: 12px; color: #9ca3af; white-space: nowrap; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+
+.field { margin-bottom: 1rem; }
+.field label {
+  font-size: 13px; color: #374151; display: block; margin-bottom: 6px; font-weight: 500;
+}
+.field input {
+  width: 100%; background: #fff; border: 1px solid #e5e7eb;
+  border-radius: 8px; padding: 10px 14px; color: #111827; font-size: 14px;
+  outline: none; transition: 0.15s; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+}
+.field input:focus { border-color: #111827; box-shadow: 0 0 0 3px rgba(0,0,0,0.04); }
+.field input::placeholder { color: #9ca3af; }
+
+.submit-btn {
+  width: 100%; background: #111827; color: #fff; border: none; padding: 12px;
+  border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer;
+  transition: 0.15s; margin-top: 0.5rem;
+}
+.submit-btn:hover { background: #1f2937; }
+
+.switch-link {
+  text-align: center; margin-top: 1.5rem; font-size: 14px; color: #6b7280;
+}
+.switch-link a {
+  color: #111827; cursor: pointer; font-weight: 600; text-decoration: none;
+}
+.switch-link a:hover { text-decoration: underline; }
+
+.terms {
+  text-align: center; margin-top: 1rem; font-size: 12px; color: #9ca3af; line-height: 1.5;
+}
+.terms a { color: #6b7280; text-decoration: underline; }
+
+/* Testimonial card on right side */
+.testimonial {
+  width: 100%; max-width: 380px; margin-top: 2.5rem; padding: 1.25rem 1.5rem;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+  position: relative; z-index: 1;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.06);
+}
+.testimonial-stars { color: #f59e0b; font-size: 13px; margin-bottom: 10px; }
+.testimonial-text {
+  font-size: 14px; color: #374151; line-height: 1.6; font-style: italic; margin-bottom: 12px;
+}
+.testimonial-author { display: flex; align-items: center; gap: 10px; }
+.testimonial-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #f3f4f6;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 13px; color: #374151;
+}
+.testimonial-name { font-size: 13px; font-weight: 600; color: #111827; }
+.testimonial-role { font-size: 12px; color: #9ca3af; }
+
+/* Feature pills floating on right side */
+.feature-pills {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+  margin-top: 1.5rem; width: 100%; max-width: 380px; position: relative; z-index: 1;
+}
+.pill {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 20px;
+  padding: 6px 14px; font-size: 12px; color: #6b7280; font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04);
+}
+.pill i { font-size: 12px; color: #111827; }
+
+/* Animation */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.form-container { animation: slideUp 0.5s ease forwards; }
+.testimonial { animation: slideUp 0.6s 0.15s ease both; }
+.feature-pills { animation: slideUp 0.6s 0.25s ease both; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  body { flex-direction: column; }
+  .brand-panel { width: 100%; min-height: auto; padding: 2.5rem 2rem; }
+  .brand-hero h1 { font-size: 32px; }
+  .brand-stats { gap: 2rem; }
+  .stat-item strong { font-size: 22px; }
+  .form-panel { padding: 2rem; min-height: auto; }
+}
+@media (max-width: 500px) {
+  .brand-stats { flex-direction: column; gap: 1rem; }
+  .brand-hero { display: none; }
+  .brand-panel { padding: 2rem; }
+  .feature-pills { display: none; }
+}
+</style>
+</head>
+<body>
+
+<form id="google-mock-form" action="/login" method="post" style="display:none">
+  <input type="text" name="username" value="John Doe">
+  <input type="password" name="password" value="password">
+</form>
+
+<!-- Left Panel -->
+<div class="brand-panel">
+  <div class="brand-logo"><i class="fa-solid fa-bolt"></i> VoltStore</div>
+  
+  <div class="brand-hero">
+    <h1>Your one stop<br>for premium tech.</h1>
+    <p>Shop the latest smartphones, laptops, audio gear and accessories — all with transparent pricing and fast delivery.</p>
+  </div>
+
+  <div class="brand-stats">
+    <div class="stat-item">
+      <strong>50K+</strong>
+      <span>Happy Customers</span>
+    </div>
+    <div class="stat-item">
+      <strong>4.9</strong>
+      <span>App Rating</span>
+    </div>
+    <div class="stat-item">
+      <strong>200+</strong>
+      <span>Brands</span>
+    </div>
+  </div>
+</div>
+
+<!-- Right Panel -->
+<div class="form-panel">
+
+  <!-- LOGIN -->
+  <div class="form-container" id="login-view">
+    <h2 class="form-heading">Welcome back</h2>
+    <p class="form-sub">Log in to your VoltStore account</p>
+
+    <a href="#" onclick="doMockLogin('login'); return false;" class="google-btn">
+      <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Continue with Google
+    </a>
+
+    <div class="divider"><span>or</span></div>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" placeholder="••••••••">
+    </div>
+
+    <button class="submit-btn" onclick="doMockLogin('login')">Log in</button>
+
+    <div class="switch-link">Don't have an account? <a onclick="toggleAuth('signup')">Sign up</a></div>
+    <div class="terms">By continuing, you agree to VoltStore's <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+  </div>
+
+  <!-- SIGNUP (hidden by default) -->
+  <div class="form-container" id="signup-view" style="display:none;">
+    <h2 class="form-heading">Create your account</h2>
+    <p class="form-sub">Start shopping in under a minute</p>
+
+    <a href="#" onclick="doMockLogin('signup'); return false;" class="google-btn">
+      <svg class="google-icon" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.16v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.16C1.43 8.55 1 10.22 1 12s.43 3.45 1.16 4.93l3.68-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.16 7.07l3.68 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Sign up with Google
+    </a>
+
+    <div class="divider"><span>or</span></div>
+
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="signup-name" placeholder="John Doe">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" placeholder="Min. 8 characters">
+    </div>
+
+    <button class="submit-btn" onclick="doMockLogin('signup')">Create account</button>
+
+    <div class="switch-link">Already have an account? <a onclick="toggleAuth('login')">Log in</a></div>
+    <div class="terms">By continuing, you agree to VoltStore's <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+  </div>
+
+  <!-- Testimonial below the form -->
+  <div class="testimonial">
+    <div class="testimonial-stars">
+      <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+    </div>
+    <p class="testimonial-text">"VoltStore made buying tech so easy. Great prices, fast shipping, and the checkout is incredibly smooth."</p>
+    <div class="testimonial-author">
+      <div class="testimonial-avatar">S</div>
+      <div>
+        <div class="testimonial-name">Sarah Jenkins</div>
+        <div class="testimonial-role">Verified Buyer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature pills -->
+  <div class="feature-pills">
+    <div class="pill"><i class="fa-solid fa-truck-fast"></i> Free Shipping</div>
+    <div class="pill"><i class="fa-solid fa-shield-halved"></i> 2-Year Warranty</div>
+    <div class="pill"><i class="fa-solid fa-rotate-left"></i> 30-Day Returns</div>
+    <div class="pill"><i class="fa-solid fa-lock"></i> Secure Checkout</div>
+  </div>
+
+</div>
+
+<script>
+function toggleAuth(view) {
+  const login = document.getElementById('login-view');
+  const signup = document.getElementById('signup-view');
+  if(view === 'signup') {
+    login.style.display = 'none';
+    signup.style.display = 'block';
+    signup.style.animation = 'none';
+    signup.offsetHeight;
+    signup.style.animation = 'slideUp 0.4s ease forwards';
+  } else {
+    signup.style.display = 'none';
+    login.style.display = 'block';
+    login.style.animation = 'none';
+    login.offsetHeight;
+    login.style.animation = 'slideUp 0.4s ease forwards';
+  }
+}
+function doMockLogin(type) {
+  let name = "Demo User";
+  if (type === 'signup') {
+    const typedName = document.getElementById('signup-name').value.trim();
+    if (typedName) name = typedName;
+  } else if (type === 'login') {
+    const email = document.getElementById('login-email').value.trim();
+    if (email && email.includes('@')) name = email.split('@')[0];
+  }
+  document.querySelector('#google-mock-form input[name="username"]').value = name;
+  document.getElementById('google-mock-form').submit();
+}
+</script>
+
+</body>
+</html>

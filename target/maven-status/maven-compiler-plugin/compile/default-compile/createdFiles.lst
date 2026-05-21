@@ -1,2 +1,5 @@
-com\voltstore\HomeController.class
+com\voltstore\LoginController.class
+com\voltstore\SecurityConfig$1.class
 com\voltstore\VoltStoreApplication.class
+com\voltstore\SecurityConfig.class
+com\voltstore\HomeController.class
