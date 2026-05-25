@@ -25,4 +25,4 @@ jobs:
       run: mvn clean install
 
     - name: Build Docker Image
-      run: docker build -t springboot-app .
+      run: docker build -t e-commercewebsite .

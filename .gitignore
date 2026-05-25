@@ -1,0 +1,18 @@
+# Build directory
+target/
+
+# H2 Database files
+voltstore_db*
+
+# IDE settings
+.idea/
+*.iml
+.vscode/
+.settings/
+.project/
+.classpath/
+
+# OS temporary files
+Thumbs.db
+Desktop.ini
+.DS_Store

@@ -1,5 +1,14 @@
+com\voltstore\repository\OrderRepository.class
 com\voltstore\LoginController.class
-com\voltstore\SecurityConfig$1.class
+com\voltstore\repository\CartItemRepository.class
+com\voltstore\model\Order.class
 com\voltstore\VoltStoreApplication.class
+com\voltstore\repository\UserRepository.class
 com\voltstore\SecurityConfig.class
+com\voltstore\controller\CartOrderController.class
 com\voltstore\HomeController.class
+com\voltstore\model\OrderItem.class
+com\voltstore\model\User.class
+com\voltstore\controller\AuthController.class
+com\voltstore\model\CartItem.class
+com\voltstore\service\CustomUserDetailsService.class

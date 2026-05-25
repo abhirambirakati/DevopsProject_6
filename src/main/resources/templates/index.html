@@ -341,6 +341,42 @@ footer { background: #ffffff; border-top: 1px solid var(--border-color); padding
 .promo-card p { font-size: 14px; opacity: 0.75; margin-bottom: 12px; }
 .promo-link { font-size: 13px; font-weight: 600; }
 .promo-light .promo-link { color: #111827; }
+
+/* Checkout and Payment styles */
+.pay-option {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+}
+.pay-option:has(input:checked) {
+  border-color: var(--theme-accent) !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+  color: var(--text-main) !important;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+}
+.field label {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.field input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-main);
+  font-size: 14px;
+  outline: none;
+  transition: 0.15s;
+}
+.field input:focus {
+  border-color: var(--border-color);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+}
 </style>
 </head>
 <body>
@@ -353,6 +389,10 @@ footer { background: #ffffff; border-top: 1px solid var(--border-color); padding
 <div class="mobile-nav" id="mobile-nav" style="overflow-y:auto">
   <button class="mobile-nav-close" onclick="toggleMobileMenu()"><i class="fa-solid fa-xmark"></i></button>
   <a href="#" onclick="toggleMobileMenu(); goPage('home')">Home</a>
+  <a th:if="${userName != null}" href="#" onclick="toggleMobileMenu(); goPage('orders')"><i class="fa-solid fa-clock-rotate-left" style="margin-right:8px"></i> My Orders</a>
+  <a th:if="${userName == null}" href="/login" onclick="toggleMobileMenu()"><i class="fa-regular fa-user" style="margin-right:8px"></i> Login / Register</a>
+  <a th:if="${userName != null}" href="/logout" onclick="toggleMobileMenu()"><i class="fa-solid fa-arrow-right-from-bracket" style="margin-right:8px"></i> Logout</a>
+  <div style="height: 1px; background: var(--border-color); margin: 0.5rem 0;"></div>
   <a href="#" class="mob-cat-link" onclick="toggleMobileMenu(); filterBy('All')">All Products</a>
   <a href="#" class="mob-cat-link" onclick="toggleMobileMenu(); filterBy('Smartphones')">Smartphones</a>
   <a href="#" class="mob-cat-link" onclick="toggleMobileMenu(); filterBy('Laptops')">Laptops</a>
@@ -386,6 +426,7 @@ footer { background: #ffffff; border-top: 1px solid var(--border-color); padding
       </div>
       <div th:if="${userName != null}" id="user-info" style="display:flex; align-items:center; gap:12px;">
         <span id="user-name-nav" style="font-size:14px; color:#111827; font-weight:600" th:text="${userName}"></span>
+        <a class="nav-icon" title="My Orders" onclick="goPage('orders')"><i class="fa-solid fa-clock-rotate-left"></i></a>
         <a class="nav-icon" title="Logout" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
       </div>
       <a class="nav-icon" title="Wishlist" onclick="goPage('wishlist')">
@@ -699,6 +740,149 @@ footer { background: #ffffff; border-top: 1px solid var(--border-color); padding
   </div>
 </div>
 
+<!-- Orders Page -->
+<div class="page" id="page-orders">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:2rem"><i class="fa-solid fa-clock-rotate-left" style="color:var(--theme-accent)"></i> My Orders</h2>
+    <div id="orders-container" style="display: flex; flex-direction: column; gap: 2rem;">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Page -->
+<div class="page" id="page-checkout">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:2rem"><i class="fa-solid fa-shield-halved" style="color:var(--success)"></i> Secure Checkout</h2>
+    <div class="cart-grid">
+      <!-- Left side: Shipping & Payment Form -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Shipping Address Form -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.5rem; font-size: 18px; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-truck-ramp-box" style="color: var(--theme-accent)"></i> 1. Shipping Address
+          </h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="field" style="grid-column: span 2;">
+              <label>Full Name</label>
+              <input type="text" id="chk-name" placeholder="John Doe" required>
+            </div>
+            <div class="field" style="grid-column: span 2;">
+              <label>Street Address</label>
+              <input type="text" id="chk-address" placeholder="123 Main St, Apartment 4B" required>
+            </div>
+            <div class="field">
+              <label>City</label>
+              <input type="text" id="chk-city" placeholder="Bangalore" required>
+            </div>
+            <div class="field">
+              <label>ZIP / Postal Code</label>
+              <input type="text" id="chk-zip" placeholder="560001" required>
+            </div>
+            <div class="field" style="grid-column: span 2;">
+              <label>Phone Number</label>
+              <input type="text" id="chk-phone" placeholder="+91 98765 43210" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method Choice -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem;">
+          <h3 style="margin-bottom: 1.5rem; font-size: 18px; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-credit-card" style="color: var(--theme-accent)"></i> 2. Payment Method
+          </h3>
+          
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <label class="pay-option" style="flex: 1; min-width: 120px; border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; cursor: pointer; text-align: center; display: block; transition: 0.2s;">
+              <input type="radio" name="payment-method" value="Credit Card" checked onclick="togglePaymentFields('Card')">
+              <i class="fa-solid fa-credit-card" style="font-size: 20px; display: block; margin-bottom: 6px;"></i>
+              <span style="font-size: 13px; font-weight: 600;">Card</span>
+            </label>
+            <label class="pay-option" style="flex: 1; min-width: 120px; border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; cursor: pointer; text-align: center; display: block; transition: 0.2s;">
+              <input type="radio" name="payment-method" value="UPI" onclick="togglePaymentFields('UPI')">
+              <i class="fa-solid fa-mobile-screen-button" style="font-size: 20px; display: block; margin-bottom: 6px;"></i>
+              <span style="font-size: 13px; font-weight: 600;">UPI</span>
+            </label>
+            <label class="pay-option" style="flex: 1; min-width: 120px; border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem; cursor: pointer; text-align: center; display: block; transition: 0.2s;">
+              <input type="radio" name="payment-method" value="Cash on Delivery" onclick="togglePaymentFields('COD')">
+              <i class="fa-solid fa-hand-holding-dollar" style="font-size: 20px; display: block; margin-bottom: 6px;"></i>
+              <span style="font-size: 13px; font-weight: 600;">COD</span>
+            </label>
+          </div>
+
+          <!-- Dynamic payment input fields -->
+          <div id="payment-fields-card">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="field" style="grid-column: span 2;">
+                <label>Card Number</label>
+                <input type="text" id="pay-card-num" placeholder="4111 2222 3333 4444" maxlength="19" oninput="formatCardNumber(this)">
+              </div>
+              <div class="field" style="grid-column: span 2;">
+                <label>Cardholder Name</label>
+                <input type="text" id="pay-card-name" placeholder="John Doe">
+              </div>
+              <div class="field">
+                <label>Expiration Date</label>
+                <input type="text" id="pay-card-exp" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+              </div>
+              <div class="field">
+                <label>CVV / CVC</label>
+                <input type="password" id="pay-card-cvv" placeholder="•••" maxlength="3">
+              </div>
+            </div>
+          </div>
+
+          <div id="payment-fields-upi" style="display: none;">
+            <div class="field">
+              <label>UPI ID (VPA)</label>
+              <input type="text" id="pay-upi-id" placeholder="username@upi">
+              <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">You will receive a payment request on your UPI app.</span>
+            </div>
+          </div>
+
+          <div id="payment-fields-cod" style="display: none;">
+            <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 1rem; color: var(--text-main); font-size: 14px; display: flex; align-items: center; gap: 12px;">
+              <i class="fa-solid fa-circle-check" style="color: var(--success); font-size: 18px;"></i>
+              <span>You will pay with Cash or card when your package is delivered. No online prepayment required.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right side: Sticky Order Summary & Pay Button -->
+      <div>
+        <div class="cart-summary" style="top: 100px;">
+          <h3 style="color: var(--text-main); margin-bottom: 1.5rem; font-size: 18px;">Review Your Order</h3>
+          
+          <!-- Product list in summary -->
+          <div id="checkout-summary-items" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; padding-right: 5px;">
+            <!-- Injected by JS -->
+          </div>
+
+          <div class="cs-row"><span>Subtotal</span> <span id="chk-subtotal" style="color: var(--text-main)">₹0</span></div>
+          <div class="cs-row"><span>Discount</span> <span id="chk-discount" style="color: var(--success)">- ₹0</span></div>
+          <div class="cs-row"><span>Delivery Charges</span> <span style="color: var(--success)">Free</span></div>
+          <div class="cs-total" style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem;">
+            <span>Total Amount</span> <span id="chk-total">₹0</span>
+          </div>
+
+          <button class="btn" style="width: 100%; justify-content: center; margin-top: 2rem; padding: 16px; background: linear-gradient(135deg, var(--theme-accent), #222);" onclick="submitPayment()">
+            <i class="fa-solid fa-shield-halved"></i> Pay & Place Order
+          </button>
+          
+          <button class="btn btn-outline" style="width: 100%; justify-content: center; margin-top: 0.75rem; border-color: transparent;" onclick="goPage('cart')">
+            Back to Cart
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 <!-- Product Details Modal -->
 <div class="modal-overlay" id="product-modal">
   <div class="modal-content" id="modal-content">
@@ -764,7 +948,10 @@ footer { background: #ffffff; border-top: 1px solid var(--border-color); padding
   </div>
 </footer>
 
-<script>
+<script th:inline="javascript">
+const currentUserName = [[${userName}]];
+const isLoggedIn = currentUserName !== null;
+
 // Hero Slider
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slide');
@@ -903,6 +1090,8 @@ function goPage(pageId) {
     
     if(pageId === 'cart') renderCart();
     if(pageId === 'wishlist') renderWishlist();
+    if(pageId === 'orders') renderOrders();
+    if(pageId === 'checkout') renderCheckout();
     
     // Trigger reveal animations on new page
     setTimeout(() => {
@@ -984,11 +1173,33 @@ function toggleWishlist(id, e) {
   }
 }
 
+async function syncCartWithServer() {
+  try {
+    const payload = cart.map(item => ({ productId: item.id, quantity: item.qty }));
+    await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (err) {
+    console.error("Failed to sync cart with server:", err);
+  }
+}
+
+function saveCart() {
+  if (isLoggedIn) {
+    syncCartWithServer();
+  } else {
+    localStorage.setItem('voltstore_cart', JSON.stringify(cart));
+  }
+}
+
 function addToCart(id) {
   const item = cart.find(x => x.id === id);
   if(item) item.qty++;
   else cart.push({id, qty:1});
   updateBadges();
+  saveCart();
   showToast('Product Added to Cart');
 }
 
@@ -1066,7 +1277,7 @@ function renderCart() {
       <div class="cs-row"><span>Delivery Charges</span> <span style="color:var(--success)">Free</span></div>
       <div class="cs-total"><span>Total Amount</span> <span>${fmt(total)}</span></div>
       ${savings > 0 ? `<div style="color:var(--success); font-size:13px; font-weight:600; margin-top:1rem; text-align:center">You will save ${fmt(savings)} on this order</div>` : ''}
-      <button class="btn" style="width:100%; justify-content:center; margin-top:2rem; padding:16px" onclick="checkout()">Proceed to Checkout</button>
+      <button class="btn" style="width:100%; justify-content:center; margin-top:2rem; padding:16px" onclick="if(isLoggedIn) { goPage('checkout'); } else { showToast('Please log in to complete your purchase'); setTimeout(() => window.location.href = '/login', 1500); }">Proceed to Checkout</button>
     </div>
   `;
 }
@@ -1081,15 +1292,327 @@ function changeQty(id, delta) {
     }
   }
   updateBadges();
+  saveCart();
   renderCart();
 }
 
-function checkout() {
-  cart = [];
+function togglePaymentFields(type) {
+  document.getElementById('payment-fields-card').style.display = type === 'Card' ? 'block' : 'none';
+  document.getElementById('payment-fields-upi').style.display = type === 'UPI' ? 'block' : 'none';
+  document.getElementById('payment-fields-cod').style.display = type === 'COD' ? 'block' : 'none';
+}
+
+function formatCardNumber(input) {
+  let val = input.value.replace(/\D/g, '');
+  let formatted = val.match(/.{1,4}/g);
+  input.value = formatted ? formatted.join(' ') : val;
+}
+
+function formatExpiry(input) {
+  let val = input.value.replace(/\D/g, '');
+  if (val.length >= 2) {
+    input.value = val.slice(0, 2) + '/' + val.slice(2, 4);
+  } else {
+    input.value = val;
+  }
+}
+
+function renderCheckout() {
+  const container = document.getElementById('checkout-summary-items');
+  if(!cart.length) {
+    container.innerHTML = '<div style="color:var(--text-muted); padding:1rem">No items in your cart</div>';
+    return;
+  }
+  
+  let subtotal = 0;
+  let savings = 0;
+  
+  container.innerHTML = cart.map(cItem => {
+    const p = db.find(x => x.id === cItem.id);
+    subtotal += p.price * cItem.qty;
+    if(p.old) savings += (p.old - p.price) * cItem.qty;
+    
+    return `
+      <div class="flex justify-between align-center" style="font-size:13px; color:var(--text-main); padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.03);">
+        <div style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:10px;">
+          <strong>${cItem.qty}x</strong> ${p.name}
+        </div>
+        <div style="font-weight:600;">${fmt(p.price * cItem.qty)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('chk-subtotal').textContent = fmt(subtotal + savings);
+  document.getElementById('chk-discount').textContent = '- ' + fmt(savings);
+  document.getElementById('chk-total').textContent = fmt(subtotal);
+
+  if (isLoggedIn && currentUserName) {
+    const nameField = document.getElementById('chk-name');
+    if (nameField && !nameField.value) {
+      nameField.value = currentUserName.charAt(0).toUpperCase() + currentUserName.slice(1);
+    }
+  }
+}
+
+async function submitPayment() {
+  const name = document.getElementById('chk-name').value.trim();
+  const address = document.getElementById('chk-address').value.trim();
+  const city = document.getElementById('chk-city').value.trim();
+  const zip = document.getElementById('chk-zip').value.trim();
+  const phone = document.getElementById('chk-phone').value.trim();
+
+  if (!name) {
+    showToast('Please fill out your Full Name.');
+    document.getElementById('chk-name').focus();
+    return;
+  }
+  if (!address) {
+    showToast('Please fill out your Street Address.');
+    document.getElementById('chk-address').focus();
+    return;
+  }
+  if (!city) {
+    showToast('Please fill out your City.');
+    document.getElementById('chk-city').focus();
+    return;
+  }
+  if (!zip) {
+    showToast('Please fill out your ZIP Code.');
+    document.getElementById('chk-zip').focus();
+    return;
+  }
+  if (!phone) {
+    showToast('Please fill out your Phone Number.');
+    document.getElementById('chk-phone').focus();
+    return;
+  }
+
+  const methodRadio = document.querySelector('input[name="payment-method"]:checked');
+  const methodValue = methodRadio ? methodRadio.value : 'Credit Card';
+
+  if (methodValue === 'Credit Card') {
+    const cardNum = document.getElementById('pay-card-num').value.replace(/\s+/g, '');
+    const cardName = document.getElementById('pay-card-name').value.trim();
+    const cardExp = document.getElementById('pay-card-exp').value.trim();
+    const cardCvv = document.getElementById('pay-card-cvv').value.trim();
+
+    if (cardNum.length < 15 || cardNum.length > 19) {
+      showToast('Please enter a valid card number.');
+      return;
+    }
+    if (!cardName) {
+      showToast('Please enter the cardholder name.');
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(cardExp)) {
+      showToast('Please enter expiry date in MM/YY format.');
+      return;
+    }
+    if (cardCvv.length < 3) {
+      showToast('Please enter a valid CVV.');
+      return;
+    }
+  } else if (methodValue === 'UPI') {
+    const upiId = document.getElementById('pay-upi-id').value.trim();
+    if (!upiId.includes('@') || upiId.length < 5) {
+      showToast('Please enter a valid UPI ID (e.g. user@upi).');
+      return;
+    }
+  }
+
+  let subtotal = 0;
+  const orderItems = cart.map(cItem => {
+    const p = db.find(x => x.id === cItem.id);
+    subtotal += p.price * cItem.qty;
+    return {
+      productId: p.id,
+      quantity: cItem.qty,
+      price: p.price
+    };
+  });
+
+  showLoader(async () => {
+    try {
+      const response = await fetch('/api/orders/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          totalAmount: subtotal,
+          shippingAddress: address,
+          city: city,
+          zipCode: zip,
+          phone: phone,
+          paymentMethod: methodValue,
+          items: orderItems
+        })
+      });
+
+      if (response.ok) {
+        cart = [];
+        updateBadges();
+        saveCart();
+        localStorage.removeItem('voltstore_cart'); // Clear guest cache
+        showToast('Payment successful! Order placed.');
+        setTimeout(() => goPage('orders'), 1500);
+      } else {
+        showToast('Checkout failed. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Connection error during checkout.');
+    }
+  });
+}
+
+async function renderOrders() {
+  const container = document.getElementById('orders-container');
+  if (!isLoggedIn) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:4rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:24px">
+        <i class="fa-solid fa-lock" style="font-size:64px; color:rgba(0,0,0,0.1); margin-bottom:1.5rem; display:block"></i>
+        <h3 style="margin-bottom:1rem">Please log in to view your orders</h3>
+        <a class="btn" href="/login">Log In / Register</a>
+      </div>
+    `;
+    return;
+  }
+  
+  try {
+    const res = await fetch('/api/orders');
+    if (!res.ok) throw new Error('Failed to fetch orders');
+    const orders = await res.json();
+    
+    if (!orders.length) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:4rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:24px">
+          <i class="fa-solid fa-box-open" style="font-size:64px; color:rgba(0,0,0,0.1); margin-bottom:1.5rem; display:block"></i>
+          <h3 style="margin-bottom:1rem">You haven't placed any orders yet</h3>
+          <button class="btn btn-outline" onclick="goPage('home')">Start Shopping</button>
+        </div>
+      `;
+      return;
+    }
+    
+    container.innerHTML = orders.map(order => {
+      const orderDateStr = new Date(order.orderDate).toLocaleDateString('en-IN', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      
+      const itemsHtml = order.items.map(item => {
+        const p = db.find(x => x.id === item.productId) || {
+          name: 'Unknown Product',
+          cat: 'Electronics',
+          img: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?q=80&w=500',
+          price: item.price
+        };
+        
+        return `
+          <div style="display:flex; align-items:center; gap:1.5rem; padding:1rem 0; border-bottom:1px solid var(--border-color)">
+            <div style="width:60px; height:60px; background:#fff; border-radius:8px; border:1px solid var(--border-color); padding:6px; display:flex; align-items:center; justify-content:center">
+              <img src="${p.img}" style="max-width:100%; max-height:100%; object-fit:contain">
+            </div>
+            <div style="flex:1">
+              <div style="font-weight:600; font-size:14px; color:var(--text-main)">${p.name}</div>
+              <div style="color:var(--text-muted); font-size:12px">${p.cat}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600; color:var(--text-main); font-size:14px">${fmt(item.price)}</div>
+              <div style="color:var(--text-muted); font-size:12px">Qty: ${item.quantity}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      const statusColor = order.status === 'Delivered' ? 'var(--success)' : 'var(--warning)';
+      const statusBg = order.status === 'Delivered' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)';
+      
+      return `
+        <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:2rem; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05)">
+          <div class="flex justify-between align-center" style="flex-wrap:wrap; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:1.25rem; margin-bottom:1rem">
+            <div>
+              <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.5px">Order ID: VOLT-${100000 + order.orderId}</div>
+              <div style="font-size:14px; color:var(--text-main); font-weight:500; margin-top:2px">${orderDateStr}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:1.5rem">
+              <span style="font-size:13px; font-weight:600; color:${statusColor}; background:${statusBg}; padding:6px 12px; border-radius:20px; border:1px solid ${statusColor}">${order.status}</span>
+              <div style="text-align:right">
+                <span style="font-size:12px; color:var(--text-muted); display:block">Total Paid</span>
+                <span style="font-size:18px; font-weight:700; color:var(--text-main)">${fmt(order.totalAmount)}</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column">
+            ${itemsHtml}
+          </div>
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; margin-top:1.25rem; padding-top:1.25rem; border-top:1px dashed var(--border-color); font-size:13px; color:var(--text-muted)">
+            <div>
+              <strong><i class="fa-solid fa-location-dot" style="margin-right:6px"></i> Shipping Address:</strong>
+              <div style="margin-top:4px; color:var(--text-main)">${order.shippingAddress}${order.city ? ', ' + order.city : ''}${order.zipCode ? ' - ' + order.zipCode : ''}</div>
+              <div style="margin-top:2px"><i class="fa-solid fa-phone" style="margin-right:4px"></i> Phone: ${order.phone}</div>
+            </div>
+            <div>
+              <strong><i class="fa-solid fa-wallet" style="margin-right:6px"></i> Payment Method:</strong>
+              <div style="margin-top:4px; color:var(--text-main); font-weight:600">${order.paymentMethod}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = `
+      <div style="text-align:center; padding:4rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:24px; color:var(--danger)">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size:64px; margin-bottom:1.5rem; display:block"></i>
+        <h3 style="margin-bottom:1rem">Error loading orders</h3>
+        <button class="btn btn-outline" onclick="renderOrders()">Try Again</button>
+      </div>
+    `;
+  }
+}
+
+async function initCart() {
+  const localCartStr = localStorage.getItem('voltstore_cart');
+  let localCart = [];
+  if (localCartStr) {
+    try {
+      localCart = JSON.parse(localCartStr);
+    } catch (e) {
+      console.error("Error parsing local cart:", e);
+    }
+  }
+
+  if (isLoggedIn) {
+    try {
+      const res = await fetch('/api/cart');
+      if (res.ok) {
+        const serverItems = await res.json();
+        const serverCart = serverItems.map(x => ({ id: x.productId, qty: x.quantity }));
+        
+        if (localCart.length > 0) {
+          localCart.forEach(localItem => {
+            const existing = serverCart.find(sItem => sItem.id === localItem.id);
+            if (existing) {
+              existing.qty = Math.max(existing.qty, localItem.qty);
+            } else {
+              serverCart.push(localItem);
+            }
+          });
+          cart = serverCart;
+          await syncCartWithServer();
+          localStorage.removeItem('voltstore_cart');
+        } else {
+          cart = serverCart;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch cart from server:", err);
+      cart = localCart;
+    }
+  } else {
+    cart = localCart;
+  }
   updateBadges();
-  renderCart();
-  showToast('Order placed successfully! Redirecting...');
-  setTimeout(() => goPage('home'), 2000);
 }
 
 function openModal(id) {
@@ -1232,6 +1755,7 @@ function buyNow(id) {
     cart.push({id, qty:1});
     updateBadges();
   }
+  saveCart();
   closeModal();
   goPage('cart');
   showToast('Proceeding to checkout...');
@@ -1299,6 +1823,7 @@ function closeInfoModal(e) {
 
 // Init
 renderGrids();
+initCart();
 setTimeout(() => {
   document.querySelectorAll('.reveal').forEach(el => {
     if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('active');
